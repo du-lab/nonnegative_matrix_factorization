@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2018 Du-Lab Team <dulab.binf@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+package algorithms;
 
 import measures.Measure;
 import org.jblas.*;
@@ -7,15 +26,10 @@ import javax.annotation.Nonnull;
 import java.util.logging.Logger;
 
 /**
- * This class performs Non-Negative Matrix Factorization.
- *
- * For a matrix X with non-negative entries, we find non-negative matrices W and H such that
- *
- *     X = dot(W, H)
- *
- *   > X of shape [num_points, num_vectors] is a collection of vectors in num_points-dimensional space
- *   > W of shape [num_points, num_components] is a collection of independent components that best describe the vectors
- *   > H of shape [num_components, num_vectors] is a mixing matrix that maps components to vectors
+ * This class performs non-negative matrix factorization.
+ * <p>
+ * Given a matrix X with non-negative entries, find non-negative matrices W and H that minimize the objective
+ * function <em>Distance(X, W x H)</em>
  *
  * @author Du-Lab Team <dulab.binf@gmail.com>
  */

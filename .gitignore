@@ -1,2 +1,6 @@
 # IntelliJ IDEA project files
+.idea
 *.iml
+
+# MacOS file
+.DS_Store
