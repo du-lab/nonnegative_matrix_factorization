@@ -28,22 +28,30 @@ import javax.annotation.Nonnull;
 import java.util.logging.Logger;
 
 /**
- * This class performs Non-Negative Least-Squares optimization.
+ * This class performs non-negative matrix regression: for given matrices X and W, find matrix H that minimizes the
+ * objective function
+ * <p>
+ * &emsp; D(X, WH) + &lambda;||H||<sub>1</sub> + 0.5 &mu;||H||<sup>2</sup>
+ * <p>
+ *     where D(X, WH) is either the euclidean distance or the Kullback-Leibler divergence, ||&middot;|| is the
+ *     Frobenius norm, and ||&middot;||<sub>1</sub> is the <i>l</i><sub>1</sub>-norm.
+ * <p>
+ * <strong>Example</strong> for given matrices {@code matrixX} and {@code matrixW}, matrix {@code matrixH} is modified
+ * to minimize the euclidean distance.
+ * <pre> {@code
+ *     UpdateRule updateRule = new MUpdateRule(0.0, 0.0);
  *
- * For matrices X and W with non-negative entries, we find non-negative matrix H such that
+ *     MatrixRegression regression = new MatrixRegression(updateRule, 1e-6, 10000);
  *
- *     X = dot(W, H)
+ *     matrixH = regression.solve(matrixX, matrixW);
+ * } </pre>
  *
- *   > X of shape [num_points, num_vectors] is a collection of vectors in num_points-dimensional space
- *   > W of shape [num_points, num_components] is a collection of independent components that best describe the vectors
- *   > H of shape [num_components, num_vectors] is a mixing matrix that maps components to vectors
- *
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
-public class NonNegativeLeastSquares
+public class MatrixRegression
 {
     /* Logger */
-    private static final Logger LOG = Logger.getLogger(NonNegativeLeastSquares.class.getName());
+    private static final Logger LOG = Logger.getLogger(MatrixRegression.class.getName());
 
     /* Tolerance of the fitting error */
     private final double tolerance;
@@ -57,13 +65,26 @@ public class NonNegativeLeastSquares
     /* Distance measure associated with the update rule */
     private final Measure measure;
 
-    public NonNegativeLeastSquares(@Nonnull UpdateRule updateRule, double tolerance, int maxIteration) {
+    /**
+     * Creates an instance of {@link MatrixRegression}
+     * @param updateRule instance of {@link UpdateRule} for matrix H
+     * @param tolerance the fitting error tolerance
+     * @param maxIteration maximum number of iterations to use
+     */
+    public MatrixRegression(@Nonnull UpdateRule updateRule, double tolerance, int maxIteration) {
         this.updateRule = updateRule;
         this.measure = updateRule.measure;
         this.tolerance = tolerance;
         this.maxIteration = maxIteration;
     }
 
+    /**
+     * Performs non-negative matrix regression with the upper limit constraint
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
+     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
+     */
     public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit)
     {
         DoubleMatrix h = Solve.solveLeastSquares(w, x).max(0.0).min(limit);
@@ -93,7 +114,12 @@ public class NonNegativeLeastSquares
         return h;
     }
 
-    @Nonnull
+    /**
+     * Performs non-negative matrix regression
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
+     */
     public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w)
     {
         DoubleMatrix limit = DoubleMatrix.ones(w.columns, x.columns).mul(Double.MAX_VALUE);

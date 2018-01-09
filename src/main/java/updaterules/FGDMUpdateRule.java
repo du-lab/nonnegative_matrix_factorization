@@ -24,24 +24,21 @@ import org.jblas.DoubleMatrix;
 import javax.annotation.Nonnull;
 
 /**
- * Implements Fast Gradient Descent update rule for the euclidean distance with regularization
+ * Performs fast-gradient-descent update for the euclidean distance with regularization
  *
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
 public class FGDMUpdateRule extends RegularizationUpdateRule
 {
     /**
      * Creates an instance of FGDMUpdateRule with given regularization coefficients
-     * @param lambda l1-regularization coefficient
-     * @param mu l2-regularization coefficient
+     * @param lambda <i>l</i><sub>1</sub>-regularization coefficient
+     * @param mu <i>l</i><sub>2</sub>-regularization coefficient
      */
     public FGDMUpdateRule(double lambda, double mu) throws IllegalArgumentException {
         super(new EuclideanDistance(), lambda, mu);
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
     {

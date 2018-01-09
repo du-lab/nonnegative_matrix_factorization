@@ -24,31 +24,31 @@ import org.jblas.DoubleMatrix;
 import javax.annotation.Nonnull;
 
 /**
- * This class is used to update matrix H in the direction of minimization of distance between X and W x H
+ * Provides a template for updating matrix H in the direction of minimizing the distance D(X, WH)
  *
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
 public abstract class UpdateRule
 {
     /* Epsilon value used for avoiding division by zero*/
     static final double EPS = 1e-12;
 
-    /* Measure associated with the update rule */
+    /** Instance of {@link Measure} associated with this update rule */
     public final Measure measure;
 
     /**
-     * Creates an instance of UpdateRule
-     * @param measure distance measure associated with the update rule
+     * Creates an instance of {@link UpdateRule}
+     * @param measure instance of {@link Measure} associated with the update rule
      */
     public UpdateRule(@Nonnull Measure measure) {
         this.measure = measure;
     }
 
     /**
-     * Updates matrix H to minimize distance between X and W x H
-     * @param x matrix of shape [num_features, num_samples]
-     * @param w matrix of shape [num_features, num_components]
-     * @param h matrix of shape [num_components, num_samples
+     * Updates matrix H to minimize distance between X and WH
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>]
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>]
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      * @return increment of |H|
      */
     abstract public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h);

@@ -26,17 +26,33 @@ import javax.annotation.Nonnull;
 import java.util.logging.Logger;
 
 /**
- * This class performs non-negative matrix factorization.
+ * This class performs non-negative matrix factorization: for given matrix X, find matrices W and H that minimize the
+ * objective function
  * <p>
- * Given a matrix X with non-negative entries, find non-negative matrices W and H that minimize the objective
- * function <em>Distance(X, W x H)</em>
+ * &emsp; D(X, WH) + &lambda;<sub>w</sub>||W||<sub>1</sub> + &lambda;<sub>h</sub>||H||<sub>1</sub> +
+ * 0.5 &mu;<sub>w</sub>||W||<sup>2</sup> + 0.5 &mu;<sub>h</sub>||H||<sup>2</sup>
+ * <p>
+ *     where D(X, WH) is either the euclidean distance or the Kullback-Leibler divergence, ||&middot;|| is the
+ *     Frobenius norm, and ||&middot;||<sub>1</sub> is the <i>l</i><sub>1</sub>-norm.
+ * <p>
+ * <strong>Example</strong> for given matrix {@code matrixX}, matrices {@code matrixW} and {@code matrixH} are modified
+ * to minimize the euclidean distance with regularization.
+ * <pre> {@code
+ *     UpdateRule updateRuleW = new MUpdateRule(1.0, 0.0);
+ *     UpdateRule updateRuleH = new MUpdateRule(0.0, 1.0);
  *
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ *     MatrixFactorization factorization = new MatrixFactorization(
+ *         updateRuleW, updateRuleH, 1e-6, 10000);
+ *
+ *     factorization.execute(matrixX, matrixW, matrixH);
+ * } </pre>
+ *
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
-public class NonNegativeMatrixFactorization
+public class MatrixFactorization
 {
     /* Logger */
-    private static final Logger LOG = Logger.getLogger(NonNegativeMatrixFactorization.class.getName());
+    private static final Logger LOG = Logger.getLogger(MatrixFactorization.class.getName());
 
     /** Tolerance of the fitting error */
     private final double tolerance;
@@ -54,14 +70,14 @@ public class NonNegativeMatrixFactorization
     private final Measure measure;
 
     /**
-     * Creates an instance of Non-Negative Matrix Factorization
+     * Creates an instance of {@link MatrixFactorization}
      * @param updateRuleW instance of {@link updaterules.UpdateRule} for matrix W
      * @param updateRuleH instance of {@link updaterules.UpdateRule} for matrix H
-     * @param tolerance tolerance for the fitting error
+     * @param tolerance the fitting error tolerance
      * @param maxIteration maximum number of iterations to use
      */
-    public NonNegativeMatrixFactorization(@Nonnull UpdateRule updateRuleW, @Nonnull UpdateRule updateRuleH,
-            double tolerance, int maxIteration)
+    public MatrixFactorization(@Nonnull UpdateRule updateRuleW, @Nonnull UpdateRule updateRuleH,
+                               double tolerance, int maxIteration)
     {
         this.updateRuleW = updateRuleW;
         this.updateRuleH = updateRuleH;
@@ -71,12 +87,13 @@ public class NonNegativeMatrixFactorization
     }
 
     /**
-     * Performs the non-negative matrix factorization with given initial components and coefficients.
-     * We use alternate coordinate descent method where we alternate between updating matrices W and H
+     * Performs the non-negative matrix factorization with given initial matrices W and H.
+     * <p>
+     * Parameters {@code w} and {@code h} contain the result of the factorization.
      *
-     * @param data matrix of shape [num_points, num_vectors], a collection of vectors in num_points-dimensional space
-     * @param w matrix of shape [num_points, num_vectors], a collection of initial components
-     * @param h matrix of shape [num_components, num_vectors], a collection of initial decomposition coefficients
+     * @param data matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
      */
     public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
     {

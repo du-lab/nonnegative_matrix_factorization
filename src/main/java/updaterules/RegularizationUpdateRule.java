@@ -23,23 +23,24 @@ import measures.Measure;
 import javax.annotation.Nonnull;
 
 /**
- * This class is used to update matrix H in the direction of minimization of regularized distance between X and W x H
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * Provides a template for updating matrix H in the direction of minimizing the distance D(X, WH) with regularization
+ *
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
 public abstract class RegularizationUpdateRule extends UpdateRule
 {
-    /* l1-regularization coefficient */
+    /** <i>l</i><sub>1</sub>-regularization coefficient */
     protected final double lambda;
 
-    /* l2-regularization coefficient */
+    /** <i>l</i><sub>2</sub>-regularization coefficient */
     protected final double mu;
 
     /**
-     * Creates an instance of RegularizationUpdateRule with given regularization coefficients
+     * Creates an instance of {@link RegularizationUpdateRule} with given regularization coefficients
      * @param measure distance measure associated with the update rule
-     * @param lambda l1-regularization coefficient
-     * @param mu l2-regularization coefficient
-     * @throws IllegalArgumentException When at least one of the regularization coefficients is negative
+     * @param lambda <i>l</i><sub>1</sub>-regularization coefficient
+     * @param mu <i>l</i><sub>2</sub>-regularization coefficient
+     * @throws IllegalArgumentException If at least one of the regularization coefficients is negative
      */
     public RegularizationUpdateRule(@Nonnull Measure measure, double lambda, double mu) throws IllegalArgumentException
     {

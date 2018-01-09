@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Overview</title>
+</head>
+<body>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<h1>Non-negative Matrix Factorization</h1>
+
+Java-implementation of non-negative matrix factorization. A non-negative matrix <i>X</i> is factorized
+into the product of two matrices <i>W</i> and <i>H</i>, such that the distance between <i>X</i> and <i>WH</i> is
+minimal.
+
+<h3>Implemented distance measures</h3>
+<ul>
+    <li>Euclidean distance || X &minus; WH ||<sup>2</sup>.</li>
+    <li>Generalized Kullback-Leibler divergence &sum; ( X log ( X / WH ) &minus; X &plus; WH ).</li>
+</ul>
+
+<h3>Implemented update rules</h3>
+<ul>
+    <li>Multiplicative update rules for Euclidean and Kullback-Leibler distances with regularization
+        terms. Based on <a href="https://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization">
+            D. Lee and H. Seung, Algorithms for Non-negative Matrix Factorization</a>.</li>
+    <li>Fast-gradient-descent update rules for Euclidean and Kullback-Leibler distance with
+        regularization terms. Based on <a href="http://ieeexplore.ieee.org/document/5936739/">N. Guan et al.,
+            Non-Negative Patch Alignment Framework</a>.</li>
+</ul>
+
+<h3>Implemented algorithms</h3>
+<ul>
+    <li>Non-negative matrix factorization (NMF), performed by alternating updates of matrices <i>W</i> and <i>H</i> to
+        minimize the distance between <i>X</i> and <i>WH</i>.</li>
+    <li>Non-negative optimization, performed by updating matrix <i>H</i> to minimize the distance between <i>X</i> and
+        <i>WH</i>.</li>
+    <li>Non-negative singular value decomposition (NNDSVD), used to initialize matrix <i>W</i> and <i>H</i>. Based on
+        <a href="http://www.sciencedirect.com/science/article/pii/S0031320307004359">C. Boutsidis and E. Gallopoulos,
+            SVD based initialization: A head start for nonnegative matrix factorization]</a>.</li>
+</ul>
+
+<h2>Example</h2>
+
+Given <code>matrixX</code> and <code>num_components</code>, perform non-negative matrix factorization using the euclidean distance with regularization, multiplicative update rule,
+and NNDSVD-initialization.
+
+<pre>
+    <code class="java">
+        final int num_points = matrixX.rows;
+        final int num_vectors = matrixX.columns;
+
+        // Create matrices W and H
+        DoubleMatrix matrixW = new DoubleMatrix(num_points, num_components);
+        DoubleMatrix matrixH = new DoubleMatrix(num_components, num_vectors);
+
+        // Initialize matrices W and H by the NNDSVD-method
+        new NonNegativeSVD(matrixX).decompose(matrixW, matrixH);
+
+        // Choose update rules for matrices W and H:
+        // Multiplicative update rule for the euclidean distance with l1-regularization
+        UpdateRule updateRuleW = new MUpdateRule(1.0, 0.0);
+        // Multiplicative update rule for the euclidean distance with l2-regularization
+        UpdateRule updateRuleH = new MUpdateRule(0.0, 1.0);
+
+        // Perform factorization
+        new MatrixFactorization(updateRuleW, updateRuleH, 1e-4, 10000).execute(matrixX, matrixW, matrixH);
+    </code>
+</pre>
+</body>
+</html>

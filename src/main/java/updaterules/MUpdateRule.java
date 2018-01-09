@@ -24,23 +24,20 @@ import org.jblas.DoubleMatrix;
 import javax.annotation.Nonnull;
 
 /**
- * Implements multiplicative update rule for the euclidean distance with regularization
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * Performs multiplicative update for the euclidean distance with regularization
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
 public class MUpdateRule extends RegularizationUpdateRule
 {
     /**
-     * Creates an instance of MKLUpdateRule with given regularization coefficients
-     * @param lambda l1-regularization coefficient
-     * @param mu l2-regularization coefficient
+     * Creates an instance of {@link MUpdateRule} with given regularization coefficients
+     * @param lambda <i>l</i><sub>1</sub>-regularization coefficient
+     * @param mu <i>l</i><sub>2</sub>-regularization coefficient
      */
     public MUpdateRule(double lambda, double mu) {
         super(new EuclideanDistance(), lambda, mu);
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
     {

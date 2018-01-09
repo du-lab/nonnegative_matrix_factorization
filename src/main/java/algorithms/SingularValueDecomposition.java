@@ -24,9 +24,28 @@ import org.jblas.Singular;
 import javax.annotation.Nonnull;
 
 /**
- * @author Du-Lab Team <dulab.binf@gmail.com>
+ * This class performs non-negative singular value decomposition: first, the singular value decomposition is
+ * performed; then, the non-negative matrices W and H are formed.
+ * <p>
+ * Based on <a href="http://www.sciencedirect.com/science/article/pii/S0031320307004359">C. Boutsidis and E. Gallopoulos,
+ *     SVD based initialization: A head start for nonnegative matrix factorization</a>
+ * <p>
+ * <strong>Examples</strong> for given matrix X and number of components N<sub>components</sub>
+ *
+ * <pre> {@code
+ *     final int num_points = matrixX.rows;
+ *     final int num_vectors = matrixX.columns;
+ *
+ *     DoubleMatrix matrixW = new DoubleMatrix(num_points, num_components);
+ *     DoubleMatrix matrixH = new DoubleMatrix(num_components, num_vectors);
+ *
+ *     SingularValueDecomposition decomposition = new SingularValueDecomposition(matrixX);
+ *     decomposition.decompose(matrixW, matrixH);
+ * } </pre>
+ *
+ * @author Du-Lab Team dulab.binf@gmail.com
  */
-public class NonNegativeSVD
+public class SingularValueDecomposition
 {
     private final DoubleMatrix matrixU;
     private final DoubleMatrix vectorS;
@@ -35,9 +54,13 @@ public class NonNegativeSVD
     private final int wLength;
     private final int hLength;
 
-    public NonNegativeSVD(@Nonnull DoubleMatrix matrix)
+    /**
+     * Creates an instance of {@link SingularValueDecomposition} for given {@code matrix}
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>] to be decomposed
+     */
+    public SingularValueDecomposition(@Nonnull DoubleMatrix x)
     {
-        DoubleMatrix[] svd = Singular.fullSVD(matrix);
+        DoubleMatrix[] svd = Singular.fullSVD(x);
         matrixU = svd[0];
         vectorS = svd[1];
         matrixV = svd[2];
@@ -46,55 +69,19 @@ public class NonNegativeSVD
         hLength = matrixV.columns;
     }
 
-    public Pair getPair(int index)
-    {
-        if (index < 0 || index >= vectorS.length)
-            throw new IllegalArgumentException("Index " + index + " is out of range");
-
-        double uPositiveNorm = columnPositiveNorm2(matrixU, index);
-        double vPositiveNorm = columnPositiveNorm2(matrixV, index);
-        double mp = uPositiveNorm * vPositiveNorm;
-
-        double uNegativeNorm = columnNegativeNorm2(matrixU, index);
-        double vNegativeNorm = columnNegativeNorm2(matrixV, index);
-        double mn = uNegativeNorm * vNegativeNorm;
-
-        Pair pair = new Pair(wLength, hLength);
-
-        if (mp > mn) {
-            double sqrtS = Math.sqrt(vectorS.get(index) * mp);
-
-            for (int i = 0; i < pair.w.length; ++i) {
-                double value = Math.max(matrixU.get(i, index), 0.0);
-                value /= uPositiveNorm;
-                pair.w[i] = sqrtS * value;
-            }
-
-            for (int i = 0; i < pair.h.length; ++i) {
-                double value = Math.max(matrixV.get(i, index), 0.0);
-                value /= vPositiveNorm;
-                pair.h[i] = sqrtS * value;
-            }
-        }
-        else {
-            double sqrtS = Math.sqrt(vectorS.get(index) * mn);
-
-            for (int i = 0; i < pair.w.length; ++i) {
-                double value = -Math.min(matrixU.get(i, index), 0.0);
-                value /= uNegativeNorm;
-                pair.w[i] = sqrtS * value;
-            }
-
-            for (int i = 0; i < pair.h.length; ++i) {
-                double value = -Math.min(matrixV.get(i, index), 0.0);
-                value /= vNegativeNorm;
-                pair.h[i] = sqrtS * value;
-            }
-        }
-
-        return pair;
-    }
-
+    /**
+     * Performs non-negative singular value decomposition (NNDSVD) of matrix X.
+     * <p>
+     * The parameters {@code w} and {@code h} contain the result of the decomposition.
+     * <p>
+     * For details, see <a href="http://www.sciencedirect.com/science/article/pii/S0031320307004359">C. Boutsidis and
+     * E. Gallopoulos, SVD based initialization: A head start for nonnegative matrix factorization</a>.
+     *
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>]
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>]
+     * @throws IllegalArgumentException if the number of columns in matrix X is not equal to the number of rows in
+     * matrix H
+     */
     public void decompose(@Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
             throws IllegalArgumentException
     {
@@ -105,7 +92,7 @@ public class NonNegativeSVD
             calculate(w, h, j);
     }
 
-    public void calculate(@Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, int index)
+    private void calculate(@Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, int index)
     {
         if (index < 0 || index >= vectorS.length)
             throw new IllegalArgumentException("Index " + index + " is out of range");
@@ -147,16 +134,6 @@ public class NonNegativeSVD
                 value /= vNegativeNorm;
                 h.put(index, i, sqrtS * value);
             }
-        }
-    }
-
-    public static class Pair {
-        public final double[] w;
-        public final double[] h;
-
-        public Pair(int wLength, int hLength) {
-            w = new double[wLength];
-            h = new double[hLength];
         }
     }
 
