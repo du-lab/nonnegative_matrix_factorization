@@ -8,10 +8,10 @@
  *     <li>Fast-gradient-descent update rule for the Kullback-Leibler divergence with regularization</li>
  * </ul>
  *
- * @see updaterules.MUpdateRule
- * @see updaterules.MKLUpdateRule
- * @see updaterules.FGDMUpdateRule
- * @see updaterules.FGDKLUpdateRule
+ * @see org.dulab.nmf.updaterules.MUpdateRule
+ * @see org.dulab.nmf.updaterules.MKLUpdateRule
+ * @see org.dulab.nmf.updaterules.FGDMUpdateRule
+ * @see org.dulab.nmf.updaterules.FGDKLUpdateRule
  * @author Du-Lab Team dulab.binf@gmail.com
  */
-package updaterules;
+package org.dulab.nmf.updaterules;

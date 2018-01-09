@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package algorithms;
+package org.dulab.nmf.algorithms;
 
-import measures.Measure;
+import org.dulab.nmf.measures.Measure;
 import org.jblas.*;
-import updaterules.UpdateRule;
+import org.dulab.nmf.updaterules.UpdateRule;
 
 import javax.annotation.Nonnull;
 import java.util.logging.Logger;
@@ -71,8 +71,8 @@ public class MatrixFactorization
 
     /**
      * Creates an instance of {@link MatrixFactorization}
-     * @param updateRuleW instance of {@link updaterules.UpdateRule} for matrix W
-     * @param updateRuleH instance of {@link updaterules.UpdateRule} for matrix H
+     * @param updateRuleW instance of {@link org.dulab.nmf.updaterules.UpdateRule} for matrix W
+     * @param updateRuleH instance of {@link org.dulab.nmf.updaterules.UpdateRule} for matrix H
      * @param tolerance the fitting error tolerance
      * @param maxIteration maximum number of iterations to use
      */

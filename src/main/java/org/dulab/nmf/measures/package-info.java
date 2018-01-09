@@ -6,8 +6,8 @@
  *     <li>Generalized Kullback-Leibler divergence &sum; ( X log ( X / WH ) &minus; X + WH )</li>
  * </ul>
  *
- * @see measures.EuclideanDistance
- * @see measures.KLDivergence
+ * @see org.dulab.nmf.measures.EuclideanDistance
+ * @see org.dulab.nmf.measures.KLDivergence
  * @author Du-Lab Team dulab.binf@gmail.com
  */
-package measures;
+package org.dulab.nmf.measures;

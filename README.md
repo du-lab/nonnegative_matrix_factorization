@@ -4,7 +4,7 @@ Java-implementation of non-negative matrix factorization. A non-negative matrix 
 into the product of two matrices *W* and *H*, such that the distance between *X* and *WH* is 
 minimal.
 
-##### Implemented distance measures
+##### Implemented distance org.dulab.nmf.measures
 
 - Euclidean distance || *X* &minus; *WH* ||<sup>2</sup>. 
 
@@ -20,7 +20,7 @@ Factorization](https://papers.nips.cc/paper/1861-algorithms-for-non-negative-mat
 regularization terms. Based on [N. Guan et al., Non-Negative Patch Alignment 
 Framework](http://ieeexplore.ieee.org/document/5936739/).
 
-##### Implemented algorithms
+##### Implemented org.dulab.nmf.algorithms
 
 - Non-negative matrix factorization (NMF), performed by alternating updates of matrices *W* and *H* to
 minimize the distance between *X* and *WH*.
