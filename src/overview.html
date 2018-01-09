@@ -58,7 +58,7 @@ and NNDSVD-initialization.
         DoubleMatrix matrixH = new DoubleMatrix(num_components, num_vectors);
 
         // Initialize matrices W and H by the NNDSVD-method
-        new NonNegativeSVD(matrixX).decompose(matrixW, matrixH);
+        new SingularValueDecomposition(matrixX).decompose(matrixW, matrixH);
 
         // Choose update rules for matrices W and H:
         // Multiplicative update rule for the euclidean distance with l1-regularization
