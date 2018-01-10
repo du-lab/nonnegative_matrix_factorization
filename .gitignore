@@ -1,5 +1,6 @@
-# IntelliJ IDEA project files
-.idea
+# IntelliJ IDEA project files and folders
+target/
+.idea/
 *.iml
 
 # MacOS file
