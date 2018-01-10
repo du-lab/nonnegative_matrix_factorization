@@ -80,12 +80,15 @@ public class MatrixRegression
 
     /**
      * Performs non-negative matrix regression with the upper limit constraint
-     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in
+     *          N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
      * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
+     * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit)
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit,
+                              boolean verbose)
     {
         DoubleMatrix h = Solve.solveLeastSquares(w, x).max(0.0).min(limit);
 
@@ -101,17 +104,42 @@ public class MatrixRegression
             if (k % 10 == 0) {
                 double error = Math.sqrt(2 * measure.get(x, w, h));
                 if ((prevError - error) / initError < tolerance) {
-                    LOG.info("NLS is completed after " + k + " iterations");
+                    if (verbose) LOG.info("NLS is completed after " + k + " iterations");
                     break;
                 }
                 prevError = error;
             }
         }
 
-        if (k >= maxIteration)
+        if (verbose && k >= maxIteration)
             LOG.info("NLS does not converge after " + k + " iterations");
 
         return h;
+    }
+
+    /**
+     * Performs non-negative matrix regression with the upper limit constraint
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in
+     *          N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
+     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
+     */
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit) {
+        return solve(x, w, limit, false);
+    }
+
+    /**
+     * Performs non-negative matrix regression
+     * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param verbose flag to output verbose information
+     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
+     */
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, boolean verbose)
+    {
+        DoubleMatrix limit = DoubleMatrix.ones(w.columns, x.columns).mul(Double.MAX_VALUE);
+        return solve(x, w, limit, verbose);
     }
 
     /**
@@ -120,9 +148,7 @@ public class MatrixRegression
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w)
-    {
-        DoubleMatrix limit = DoubleMatrix.ones(w.columns, x.columns).mul(Double.MAX_VALUE);
-        return solve(x, w, limit);
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w) {
+        return solve(x, w, false);
     }
 }

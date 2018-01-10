@@ -94,8 +94,9 @@ public class MatrixFactorization
      * @param data matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
+     * @param verbose flag to output verbose information
      */
-    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
+    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, boolean verbose)
     {
         DoubleMatrix x = data.dup();
         DoubleMatrix xt = x.transpose();
@@ -114,16 +115,31 @@ public class MatrixFactorization
             if (k % 10 == 0) {
                 double error = measure.get(x, wt.transpose(), h);
                 if ((prevError - error) / initError < tolerance) {
-                    LOG.info("NMF is completed after " + k + " iterations");
+                    if (verbose) LOG.info("NMF is completed after " + k + " iterations");
                     break;
                 }
                 prevError = error;
             }
         }
 
-        if (k >= maxIteration)
+        if (verbose && k >= maxIteration)
             LOG.info("NMF does not converge after " + k + " iterations");
 
         w.copy(wt.transpose());
+    }
+
+    /**
+     * Performs the non-negative matrix factorization with given initial matrices W and H.
+     * <p>
+     * Parameters {@code w} and {@code h} contain the result of the factorization.
+     *
+     * @param data matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in
+     *             N<sub>points</sub>-dimensional space
+     * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
+     * @param verbose flag to output verbose information
+     */
+    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+        execute(data, w, h, false);
     }
 }
