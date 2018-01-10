@@ -41,11 +41,11 @@ development and testing purposes.
 
 - [Java 1.8](https://java.com/en/download/) or newer.
 
-- [Maven 4.0.0](https://maven.apache.org/) or newer. 
+- [Maven 3](https://maven.apache.org/)  or newer.
 
 ## Contributing
 
-Code contributions are welcome. For details, please contact us.
+Code contributions are welcome. Please, contact us if you have any questions.
 
 ## Authors
 
@@ -53,4 +53,4 @@ Code contributions are welcome. For details, please contact us.
 
 ## Licence
 
-This project is licenced under the GNU GPL v2 licence.
+This project is licenced under the GNU GPL v2 licence - see the [LICENSE](LICENSE) file for details.
