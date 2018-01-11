@@ -137,7 +137,6 @@ public class MatrixFactorization
      *             N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
-     * @param verbose flag to output verbose information
      */
     public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
         execute(data, w, h, false);
