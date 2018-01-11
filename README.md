@@ -43,6 +43,19 @@ development and testing purposes.
 
 - [Maven 3](https://maven.apache.org/)  or newer.
 
+### Installation
+
+To install the package, clone this project and use maven to build it:
+```
+git clone https://github.com/du-lab/nonnegative_matrix_factorization.git
+cd nonnegative_matrix_factorization/
+mvn clean install
+``` 
+
+## Documentation
+
+API documentation can be found [here](https://du-lab.github.io/nonnegative_matrix_factorization/).
+
 ## Contributing
 
 Code contributions are welcome. Please, contact us if you have any questions.
