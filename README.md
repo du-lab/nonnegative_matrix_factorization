@@ -6,7 +6,7 @@ minimal. The distance can be evaluated using the euclidean distance or the gener
 Kullback-Leibler divergence with optional regularization terms. Two types of 
 gradient-descent update rules are supported.
 
-##### Implemented distance org.dulab.nmf.measures
+##### Implemented distance org.dulab.javanmf.measures
 
 - Euclidean distance || *X* &minus; *WH* ||<sup>2</sup>. 
 
@@ -22,7 +22,7 @@ Factorization](https://papers.nips.cc/paper/1861-algorithms-for-non-negative-mat
 regularization terms. Based on [N. Guan et al., Non-Negative Patch Alignment 
 Framework](http://ieeexplore.ieee.org/document/5936739/).
 
-##### Implemented org.dulab.nmf.algorithms
+##### Implemented org.dulab.javanmf.algorithms
 
 - Non-negative matrix factorization (NMF), performed by alternating updates of matrices *W* and *H* to
 minimize the distance between *X* and *WH*.

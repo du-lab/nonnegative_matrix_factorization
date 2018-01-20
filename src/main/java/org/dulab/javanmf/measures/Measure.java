@@ -1,4 +1,4 @@
-package org.dulab.nmf.measures;
+package org.dulab.javanmf.measures;
 
 import org.jblas.DoubleMatrix;
 

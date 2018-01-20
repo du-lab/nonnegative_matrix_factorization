@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package org.dulab.nmf.updaterules;
+package org.dulab.javanmf.updaterules;
 
-import org.dulab.nmf.measures.Measure;
+import org.dulab.javanmf.measures.Measure;
 
 import javax.annotation.Nonnull;
 

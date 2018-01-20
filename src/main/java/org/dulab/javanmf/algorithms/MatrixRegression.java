@@ -16,13 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package org.dulab.nmf.algorithms;
+package org.dulab.javanmf.algorithms;
 
-import org.dulab.nmf.measures.Measure;
+import org.dulab.javanmf.measures.Measure;
 import org.jblas.DoubleMatrix;
 import org.jblas.Solve;
 
-import org.dulab.nmf.updaterules.UpdateRule;
+import org.dulab.javanmf.updaterules.UpdateRule;
 
 import javax.annotation.Nonnull;
 import java.util.logging.Logger;

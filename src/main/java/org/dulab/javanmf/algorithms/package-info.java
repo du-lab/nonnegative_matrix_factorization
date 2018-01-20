@@ -12,9 +12,9 @@
  *     SVD based initialization: A head start for nonnegative matrix factorization]</a>.</li>
  * </ul>
  *
- * @see org.dulab.nmf.algorithms.MatrixFactorization
- * @see org.dulab.nmf.algorithms.MatrixRegression
- * @see org.dulab.nmf.algorithms.SingularValueDecomposition
+ * @see org.dulab.javanmf.algorithms.MatrixFactorization
+ * @see org.dulab.javanmf.algorithms.MatrixRegression
+ * @see org.dulab.javanmf.algorithms.SingularValueDecomposition
  * @author Du-Lab Team dulab.binf@gmail.com
  */
-package org.dulab.nmf.algorithms;
+package org.dulab.javanmf.algorithms;

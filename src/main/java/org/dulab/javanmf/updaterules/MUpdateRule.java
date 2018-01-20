@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package org.dulab.nmf.updaterules;
+package org.dulab.javanmf.updaterules;
 
-import org.dulab.nmf.measures.EuclideanDistance;
+import org.dulab.javanmf.measures.EuclideanDistance;
 import org.jblas.DoubleMatrix;
 
 import javax.annotation.Nonnull;
