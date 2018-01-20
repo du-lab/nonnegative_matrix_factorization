@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.dulab</groupId>
-    <artifactId>nmf</artifactId>
+    <artifactId>javanmf</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>

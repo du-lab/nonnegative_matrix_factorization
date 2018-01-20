@@ -1,8 +1,10 @@
-# Non-negative Matrix Factorization
+# JavaNMF: A Java library for Non-negative Matrix Factorization
 
-Java-implementation of non-negative matrix factorization. A non-negative matrix *X* is factorized 
+Java library for performing non-negative matrix factorization. A non-negative matrix *X* is factorized 
 into the product of two matrices *W* and *H*, such that the distance between *X* and *WH* is 
-minimal.
+minimal. The distance can be evaluated using the euclidean distance or the generalized 
+Kullback-Leibler divergence with optional regularization terms. Two types of 
+gradient-descent update rules are supported.
 
 ##### Implemented distance org.dulab.nmf.measures
 
@@ -54,7 +56,31 @@ mvn clean install
 
 ## Documentation
 
-API documentation can be found [here](https://du-lab.github.io/nonnegative_matrix_factorization/).
+__Example__: Given `matrixX` and `num_components`, perform non-negative matrix factorization using the euclidean distance with regularization, multiplicative update rule,
+and NNDSVD-initialization.
+
+```java
+final int num_points = matrixX.rows;
+final int num_vectors = matrixX.columns;
+
+// Create matrices W and H
+DoubleMatrix matrixW = new DoubleMatrix(num_points, num_components);
+DoubleMatrix matrixH = new DoubleMatrix(num_components, num_vectors);
+
+// Initialize matrices W and H by the NNDSVD-method
+new SingularValueDecomposition(matrixX).decompose(matrixW, matrixH);
+
+// Choose update rules for matrices W and H:
+// Multiplicative update rule for the euclidean distance with l1-regularization
+UpdateRule updateRuleW = new MUpdateRule(1.0, 0.0);
+// Multiplicative update rule for the euclidean distance with l2-regularization
+UpdateRule updateRuleH = new MUpdateRule(0.0, 1.0);
+
+// Perform factorization
+new MatrixFactorization(updateRuleW, updateRuleH, 1e-4, 10000).execute(matrixX, matrixW, matrixH);
+```
+
+Detailed __API documentation__ can be found [here](https://du-lab.github.io/nonnegative_matrix_factorization/).
 
 ## Contributing
 
