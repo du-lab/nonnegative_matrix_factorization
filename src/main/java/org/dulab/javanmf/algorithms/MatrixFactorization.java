@@ -105,16 +105,19 @@ public class MatrixFactorization
         final double initError = measure.get(x, w, h);
         double prevError = initError;
 
+        DoubleMatrix htBuffer = new DoubleMatrix();
+        DoubleMatrix wttBuffer = new DoubleMatrix();
+
         // Update matrices WT and H until the error is small or the maximum number of iterations is reached
         int k;
         for (k = 1; k < maxIteration + 1; ++k)
         {
-            updateRuleW.update(xt, h.transpose(), wt);
-            updateRuleH.update(x, wt.transpose(), h);
+            updateRuleW.update(xt, MatrixUtils.transpose(h, htBuffer), wt);
+            updateRuleH.update(x, MatrixUtils.transpose(wt, wttBuffer), h);
 
             if (k % 10 == 0) {
-                double error = measure.get(x, wt.transpose(), h);
-                if ((prevError - error) / initError < tolerance) {
+                double error = measure.get(x, MatrixUtils.transpose(wt, wttBuffer), h);
+                if (Math.abs(prevError - error) / initError < tolerance) {
                     if (verbose) LOG.info("NMF is completed after " + k + " iterations");
                     break;
                 }

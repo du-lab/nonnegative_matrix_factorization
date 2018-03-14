@@ -18,6 +18,7 @@
 
 package org.dulab.javanmf.updaterules;
 
+import org.dulab.javanmf.algorithms.MatrixUtils;
 import org.dulab.javanmf.measures.EuclideanDistance;
 import org.jblas.DoubleMatrix;
 
@@ -30,6 +31,10 @@ import javax.annotation.Nonnull;
  */
 public class FGDMUpdateRule extends RegularizationUpdateRule
 {
+    private final DoubleMatrix wdBuffer = new DoubleMatrix();
+    private final DoubleMatrix whBuffer = new DoubleMatrix();
+    private final DoubleMatrix nablaBuffer = new DoubleMatrix();
+
     /**
      * Creates an instance of FGDMUpdateRule with given regularization coefficients
      * @param lambda <i>l</i><sub>1</sub>-regularization coefficient
@@ -50,8 +55,8 @@ public class FGDMUpdateRule extends RegularizationUpdateRule
         DoubleMatrix nabla = getNabla(x, w, h);
 
         // Find the optimal rate of convergence Theta
-        DoubleMatrix wd = w.mmul(nabla);
-        DoubleMatrix wh = w.mmul(h);
+        DoubleMatrix wd = MatrixUtils.multiply(w, nabla, wdBuffer);
+        DoubleMatrix wh = MatrixUtils.multiply(w, h, whBuffer);
         DoubleMatrix theta = DoubleMatrix.ones(1, numSamples);
         for (int t = 0; t < 100; ++t)
         {
@@ -123,5 +128,33 @@ public class FGDMUpdateRule extends RegularizationUpdateRule
         nabla.subi(h);
 
         return nabla;
+    }
+
+    private DoubleMatrix getNabla(DoubleMatrix x, DoubleMatrix w, DoubleMatrix h, DoubleMatrix buffer) {
+
+        if (h.rows != buffer.rows || h.columns != buffer.columns)
+            buffer.resize(h.rows, h.columns);
+
+//        for (int i = 0; i < h.rows; ++i)
+//            for (int j = 0; j < h.columns; ++j) {
+//
+//                double nominator = 0.0;
+//                for (int k = 0; k < w.rows; ++k)
+//                    nominator += w.get(k, i) * x.get(k, j);
+//
+//                double denominator = 0.0;
+//                for (int k = 0; k < w.columns; ++k) {
+//                    double wtw = 0.0;
+//                    for (int l = 0; l < w.rows; ++l)
+//                        wtw += w.get(l, i) * w.get(l, k);
+//                    denominator += wtw * h.get(k, j);
+//                }
+//                denominator += lambda + mu * h.get(i, j);
+//                denominator = (denominator > EPS) ? denominator : EPS;
+//
+//                buffer.put(i, j, h.get(i, j) * (nominator / denominator - 1.0));
+//            }
+
+        return buffer;
     }
 }
