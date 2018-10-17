@@ -90,7 +90,9 @@ public class MatrixRegression
     public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit,
                               boolean verbose)
     {
-        DoubleMatrix h = Solve.solveLeastSquares(w, x).max(0.0).min(limit);
+        DoubleMatrix h = Solve.solveLeastSquares(w, x)
+                .max(1e-12)
+                .min(limit);
 
         final double initError = Math.sqrt(2 * measure.get(x, w, h));
         double prevError = initError;
