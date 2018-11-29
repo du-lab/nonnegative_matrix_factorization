@@ -41,8 +41,11 @@ public class MUpdateRule extends RegularizationUpdateRule
     @Override
     public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
     {
+        double a = x.length;
+        double b = h.length;
+
         DoubleMatrix wt = w.transpose();
-        h.muli(wt.mmul(x).div(wt.mmul(w).mmul(h).add(lambda).add(h.mul(mu)).max(1e-12)));
+        h.muli(wt.mmul(x).div(wt.mmul(w).mmul(h).add(a / b * lambda).add(h.mul(a / b * mu)).max(1e-12)));
         return 0.0;
     }
 }
