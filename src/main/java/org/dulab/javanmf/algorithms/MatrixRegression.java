@@ -87,12 +87,12 @@ public class MatrixRegression
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit,
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, @Nonnull DoubleMatrix limit,
                               boolean verbose)
     {
-        DoubleMatrix h = Solve.solveLeastSquares(w, x)
-                .max(1e-12)
-                .min(limit);
+//        DoubleMatrix h = Solve.solveLeastSquares(w, x)
+//                .max(1e-12)
+//                .min(limit);
 
         final double initError = Math.sqrt(2 * measure.get(x, w, h));
         double prevError = initError;
@@ -127,8 +127,8 @@ public class MatrixRegression
      * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix limit) {
-        return solve(x, w, limit, false);
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, @Nonnull DoubleMatrix limit) {
+        return solve(x, w, h, limit, false);
     }
 
     /**
@@ -138,10 +138,10 @@ public class MatrixRegression
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, boolean verbose)
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h,  boolean verbose)
     {
         DoubleMatrix limit = DoubleMatrix.ones(w.columns, x.columns).mul(Double.MAX_VALUE);
-        return solve(x, w, limit, verbose);
+        return solve(x, w, h, limit, verbose);
     }
 
     /**
@@ -150,7 +150,7 @@ public class MatrixRegression
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w) {
-        return solve(x, w, false);
+    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+        return solve(x, w, h, false);
     }
 }
