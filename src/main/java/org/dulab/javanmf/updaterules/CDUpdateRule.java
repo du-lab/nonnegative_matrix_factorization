@@ -37,7 +37,6 @@ public class CDUpdateRule extends RegularizationUpdateRule {
         DoubleMatrix denominator = wt.mmul(w);
         DoubleMatrix nominator = denominator.mmul(h).sub(wt.mmul(x));
 
-
         for (int r = 0; r < h.rows; ++r) {
             for (int i = 0; i < h.columns; ++i) {
 
