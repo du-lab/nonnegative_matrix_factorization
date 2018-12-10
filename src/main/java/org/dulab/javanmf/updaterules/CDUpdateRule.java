@@ -32,6 +32,9 @@ public class CDUpdateRule extends RegularizationUpdateRule {
     @Override
     public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
 
+        double a = x.length;
+        double b = h.length;
+
         DoubleMatrix wt = w.transpose();
 
         DoubleMatrix denominator = wt.mmul(w);
@@ -40,7 +43,7 @@ public class CDUpdateRule extends RegularizationUpdateRule {
         for (int r = 0; r < h.rows; ++r) {
             for (int i = 0; i < h.columns; ++i) {
 
-                double newValue = h.get(r, i) - (nominator.get(r, i) + lambda) / denominator.get(r, r);
+                double newValue = h.get(r, i) - (nominator.get(r, i) + a / b * lambda) / denominator.get(r, r);
 
                 h.put(r, i, newValue > 0.0 ? newValue : 0.0);
             }

@@ -112,8 +112,9 @@ public class MatrixFactorization
         int k;
         for (k = 1; k < maxIteration + 1; ++k)
         {
-            updateRuleW.update(xt, MatrixUtils.transpose(h, htBuffer), wt);
+
             updateRuleH.update(x, MatrixUtils.transpose(wt, wttBuffer), h);
+            updateRuleW.update(xt, MatrixUtils.transpose(h, htBuffer), wt);
 
             if (k % 10 == 0) {
                 double error = measure.get(x, MatrixUtils.transpose(wt, wttBuffer), h);
