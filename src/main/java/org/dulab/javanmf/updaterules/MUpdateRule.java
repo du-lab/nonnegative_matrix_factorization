@@ -30,6 +30,10 @@ import java.util.stream.IntStream;
  */
 public class MUpdateRule extends RegularizationUpdateRule
 {
+    private DoubleMatrix wtxBuffer = null;
+    private DoubleMatrix wtwBuffer = null;
+    private DoubleMatrix wtwhBuffer = null;
+
     /**
      * Creates an instance of {@link MUpdateRule} with given regularization coefficients
      * @param lambda <i>l</i><sub>1</sub>-regularization coefficient
@@ -48,40 +52,17 @@ public class MUpdateRule extends RegularizationUpdateRule
         DoubleMatrix wt = w.transpose();
 //        h.muli(wt.mmul(x).div(wt.mmul(w).mmul(h).add(a / b * lambda).add(h.mul(a / b * mu)).max(1e-12)));
 
-        h.muli(wt.mmul(x).divi(wt.mmul(w).mmul(h).addi(a / b * lambda).addi(h.mul(a / b * mu)).maxi(1e-12)));
+        if (wtxBuffer == null || wtxBuffer.rows != w.columns || wtxBuffer.columns != x.columns)
+            wtxBuffer = new DoubleMatrix(w.columns, x.columns);
 
-//        DoubleMatrix buffer1 = new DoubleMatrix(h.rows, h.columns);
-//        h.muli(wt.mmuli(x, buffer1));
-//
-//        DoubleMatrix buffer2 = new DoubleMatrix(w.columns, w.columns);
-//        wt.mmuli(w, buffer2);
-//        buffer2.mmuli(h, buffer1);
-//        buffer1.addi(a / b * lambda);
-//        buffer1.addi(h.mul(a / b * mu));
-//        buffer1.maxi(1e-12);
-//        h.divi(buffer1);
+        if (wtwBuffer == null || wtwBuffer.rows != w.columns || wtwBuffer.columns != w.columns)
+            wtwBuffer = new DoubleMatrix(w.columns, w.columns);
 
-//        for (int i = 0; i < h.rows; ++i) {
-//            for (int j = 0; j < h.columns; ++j) {
-//
-//                double nominator = 0.0;
-//                for (int k = 0; k < x.rows; ++k) {
-//                    nominator += w.get(k, i) * x.get(k, j);
-//                }
-//
-//                double denominator = 0.0;
-//                for (int k = 0; k < w.rows; ++k) {
-//                    for (int l = 0; l < h.rows; ++l) {
-//                        denominator += w.get(k, i) * w.get(k, l) * h.get(l, j);
-//                    }
-//                }
-//                denominator += a / b * lambda;
-//                denominator += a / b * mu * h.get(i, j);
-//                denominator = denominator > 1e-12 ? denominator : 1e-12;
-//
-//                h.put(i, j, h.get(i, j) * nominator / denominator);
-//            }
-//        }
+        if (wtwhBuffer == null || wtwhBuffer.rows != w.columns || wtwhBuffer.columns != h.columns)
+            wtwhBuffer = new DoubleMatrix(w.columns, h.columns);
+
+        h.muli(wt.mmuli(x, wtxBuffer).divi(
+                wt.mmuli(w, wtwBuffer).mmuli(h, wtwhBuffer).addi(a / b * lambda).addi(h.mul(a / b * mu)).maxi(1e-12)));
 
         return 0.0;
     }
