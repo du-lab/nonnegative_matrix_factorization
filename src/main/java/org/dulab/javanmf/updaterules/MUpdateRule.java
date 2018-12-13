@@ -30,6 +30,8 @@ import java.util.stream.IntStream;
  */
 public class MUpdateRule extends RegularizationUpdateRule
 {
+    private DoubleMatrix wtBuffer = null;
+    private DoubleMatrix hBuffer = null;
     private DoubleMatrix wtxBuffer = null;
     private DoubleMatrix wtwBuffer = null;
     private DoubleMatrix wtwhBuffer = null;
@@ -49,8 +51,14 @@ public class MUpdateRule extends RegularizationUpdateRule
         double a = x.length;
         double b = h.length;
 
-        DoubleMatrix wt = w.transpose();
+//        DoubleMatrix wt = w.transpose();
 //        h.muli(wt.mmul(x).div(wt.mmul(w).mmul(h).add(a / b * lambda).add(h.mul(a / b * mu)).max(1e-12)));
+
+        if (wtBuffer == null || wtBuffer.rows != w.columns || wtBuffer.columns != w.rows)
+            wtBuffer = new DoubleMatrix(w.columns, w.rows);
+
+        if (hBuffer == null || hBuffer.rows != h.rows || hBuffer.columns != h.columns)
+            hBuffer = new DoubleMatrix(h.rows, h.columns);
 
         if (wtxBuffer == null || wtxBuffer.rows != w.columns || wtxBuffer.columns != x.columns)
             wtxBuffer = new DoubleMatrix(w.columns, x.columns);
@@ -61,9 +69,22 @@ public class MUpdateRule extends RegularizationUpdateRule
         if (wtwhBuffer == null || wtwhBuffer.rows != w.columns || wtwhBuffer.columns != h.columns)
             wtwhBuffer = new DoubleMatrix(w.columns, h.columns);
 
-        h.muli(wt.mmuli(x, wtxBuffer).divi(
-                wt.mmuli(w, wtwBuffer).mmuli(h, wtwhBuffer).addi(a / b * lambda).addi(h.mul(a / b * mu)).maxi(1e-12)));
+
+        transpose(w, wtBuffer);
+        hBuffer.copy(h);
+        h.muli(wtBuffer.mmuli(x, wtxBuffer).divi(
+                wtBuffer.mmuli(w, wtwBuffer)
+                        .mmuli(h, wtwhBuffer)
+                        .addi(a / b * lambda)
+                        .addi(hBuffer.muli(a / b * mu))
+                        .maxi(1e-12)));
 
         return 0.0;
+    }
+
+    private void transpose(DoubleMatrix w, DoubleMatrix wt) {
+        for (int i = 0; i < w.rows; ++i)
+            for (int j = 0; j < w.columns; ++j)
+                wt.put(j, i, w.get(i, j));
     }
 }
