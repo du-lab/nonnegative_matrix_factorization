@@ -1,6 +1,7 @@
 package org.dulab.javanmf.measures;
 
 import org.jblas.DoubleMatrix;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 import javax.annotation.Nonnull;
 
@@ -17,5 +18,7 @@ public abstract class Measure
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      * @return distance value
      */
-    public abstract double get(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h);
+    public abstract double get(@Nonnull PrimitiveDenseStore x,
+                               @Nonnull PrimitiveDenseStore w,
+                               @Nonnull PrimitiveDenseStore h);
 }

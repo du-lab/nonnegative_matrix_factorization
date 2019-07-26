@@ -19,11 +19,19 @@
 package org.dulab.javanmf.algorithms;
 
 import org.jblas.DoubleMatrix;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+
+import java.nio.file.ProviderMismatchException;
 
 /**
  * @author Du-Lab Team dulab.binf@gmail.com
  */
 public class MatrixUtils {
+
+    private static final PhysicalStore.Factory<Double, PrimitiveDenseStore> storeFactory =
+            PrimitiveDenseStore.FACTORY;
 
     public static DoubleMatrix multiply(DoubleMatrix x, DoubleMatrix y, DoubleMatrix buffer) {
 
@@ -36,14 +44,16 @@ public class MatrixUtils {
         return buffer;
     }
 
-    public static DoubleMatrix transpose(DoubleMatrix x, DoubleMatrix buffer) {
+    public static PrimitiveDenseStore transpose(MatrixStore x, PrimitiveDenseStore buffer) {
 
-        if (x.rows != buffer.columns || x.columns != buffer.rows)
-            buffer.resize(x.columns, x.rows);
+        if (x.countRows() != buffer.countColumns() || x.countColumns() != buffer.countRows())
+            buffer = storeFactory.makeZero(x.countColumns(), x.countRows());
+//            buffer.resize(x.columns, x.rows);
 
-        for (int i = 0; i < x.rows; ++i)
-            for (int j = 0; j < x.columns; ++j)
-                buffer.put(j, i, x.get(i, j));
+        for (int i = 0; i < x.countRows(); ++i)
+            for (int j = 0; j < x.countColumns(); ++j)
+                buffer.set(j, i, x.get(i, j));
+//                buffer.put(j, i, x.get(i, j));
 
         return buffer;
     }

@@ -53,7 +53,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.ojalgo</groupId>
+            <artifactId>ojalgo</artifactId>
+            <version>47.2.0</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

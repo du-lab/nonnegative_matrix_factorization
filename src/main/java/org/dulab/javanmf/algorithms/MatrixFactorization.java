@@ -19,8 +19,10 @@
 package org.dulab.javanmf.algorithms;
 
 import org.dulab.javanmf.measures.Measure;
-import org.jblas.*;
 import org.dulab.javanmf.updaterules.UpdateRule;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 import javax.annotation.Nonnull;
 import java.util.logging.Logger;
@@ -96,17 +98,22 @@ public class MatrixFactorization
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
      * @param verbose flag to output verbose information
      */
-    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, boolean verbose)
+    public void execute(@Nonnull PrimitiveDenseStore data,
+                        @Nonnull PrimitiveDenseStore w,
+                        @Nonnull PrimitiveDenseStore h, boolean verbose)
     {
-        DoubleMatrix x = data.dup();
-        DoubleMatrix xt = x.transpose();
-        DoubleMatrix wt = w.transpose();
+        PhysicalStore.Factory<Double, PrimitiveDenseStore> storeFactory =
+                PrimitiveDenseStore.FACTORY;
+
+        PrimitiveDenseStore x = data.copy();
+        MatrixStore xt = x.transpose();
+        MatrixStore wt = w.transpose();
 
         final double initError = measure.get(x, w, h);
         double prevError = initError;
 
-        DoubleMatrix htBuffer = new DoubleMatrix();
-        DoubleMatrix wttBuffer = new DoubleMatrix();
+        PrimitiveDenseStore htBuffer = storeFactory.makeZero(h.countColumns(), h.countRows());
+        PrimitiveDenseStore wttBuffer = storeFactory.makeZero(w.countRows(), w.countColumns());
 
         // Update matrices WT and H until the error is small or the maximum number of iterations is reached
         int k;
@@ -129,7 +136,9 @@ public class MatrixFactorization
         if (verbose && k >= maxIteration)
             LOG.info("NMF does not converge after " + k + " iterations");
 
-        w.copy(wt.transpose());
+
+//        w.copy(wt.transpose());
+        MatrixUtils.transpose(wt, w);
     }
 
     /**
@@ -142,7 +151,9 @@ public class MatrixFactorization
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
      */
-    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+    public void execute(@Nonnull PrimitiveDenseStore data,
+                        @Nonnull PrimitiveDenseStore w,
+                        @Nonnull PrimitiveDenseStore h) {
         execute(data, w, h, false);
     }
 }
