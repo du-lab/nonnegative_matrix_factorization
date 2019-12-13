@@ -83,6 +83,8 @@ public class MatrixRegression
      * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in
      *          N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
+     *          coefficients
      * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
@@ -106,7 +108,7 @@ public class MatrixRegression
             if (k % 10 == 0) {
                 double error = Math.sqrt(2 * measure.get(x, w, h));
                 if ((prevError - error) / initError < tolerance) {
-                    if (verbose) LOG.info("NLS is completed after " + k + " iterations");
+                    if (verbose) LOG.fine("NLS is completed after " + k + " iterations");
                     break;
                 }
                 prevError = error;
@@ -114,7 +116,7 @@ public class MatrixRegression
         }
 
         if (verbose && k >= maxIteration)
-            LOG.info("NLS does not converge after " + k + " iterations");
+            LOG.fine("NLS does not converge after " + k + " iterations");
 
         return h;
     }
@@ -124,6 +126,8 @@ public class MatrixRegression
      * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in
      *          N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
+     *          coefficients
      * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
@@ -135,6 +139,8 @@ public class MatrixRegression
      * Performs non-negative matrix regression
      * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
+     *          coefficients
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
@@ -148,6 +154,8 @@ public class MatrixRegression
      * Performs non-negative matrix regression
      * @param x matrix of shape [N<sub>points</sub>, N<sub>vectors</sub>], a collection of vectors in N<sub>points</sub>-dimensional space
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
+     * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
+     *          coefficients
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
     public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {

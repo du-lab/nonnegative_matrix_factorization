@@ -119,7 +119,7 @@ public class MatrixFactorization
             if (k % 10 == 0) {
                 double error = measure.get(x, MatrixUtils.transpose(wt, wttBuffer), h);
                 if (Math.abs(prevError - error) / initError < tolerance) {
-                    if (verbose) LOG.info("NMF is completed after " + k + " iterations");
+                    if (verbose) LOG.fine("NMF is completed after " + k + " iterations");
                     break;
                 }
                 prevError = error;
@@ -127,7 +127,7 @@ public class MatrixFactorization
         }
 
         if (verbose && k >= maxIteration)
-            LOG.info("NMF does not converge after " + k + " iterations");
+            LOG.fine("NMF does not converge after " + k + " iterations");
 
         w.copy(wt.transpose());
     }
