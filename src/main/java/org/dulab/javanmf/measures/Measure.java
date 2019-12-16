@@ -1,5 +1,6 @@
 package org.dulab.javanmf.measures;
 
+import org.ejml.data.DMatrixRMaj;
 import org.jblas.DoubleMatrix;
 
 import javax.annotation.Nonnull;
@@ -17,5 +18,5 @@ public abstract class Measure
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      * @return distance value
      */
-    public abstract double get(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h);
+    public abstract double get(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h);
 }

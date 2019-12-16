@@ -1,5 +1,6 @@
 package org.dulab.javanmf.measures;
 
+import org.ejml.data.DMatrixRMaj;
 import org.jblas.DoubleMatrix;
 
 import javax.annotation.Nonnull;
@@ -12,17 +13,17 @@ import java.util.stream.IntStream;
 public class EuclideanDistance extends Measure
 {
     @Override
-    public double get(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+    public double get(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h) {
 
 //        double norm = x.sub(w.mmul(h)).norm2();
 
         // Calculate ||X - W x H||^2
         double norm2 = 0.0;
-        for (int i = 0; i < x.rows; ++i)
-            for (int j = 0; j < x.columns; ++j) {
+        for (int i = 0; i < x.numRows; ++i)
+            for (int j = 0; j < x.numCols; ++j) {
                 double residual = x.get(i, j);
-                for (int k = 0; k < w.columns; ++k)
-                    residual -= w.get(i, k) * h.get(k, j);
+                for (int k = 0; k < w.numCols; ++k)
+                    residual -= w.unsafe_get(i, k) * h.unsafe_get(k, j);
                 norm2 += residual * residual;
             }
 
