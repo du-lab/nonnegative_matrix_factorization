@@ -6,7 +6,7 @@
 
     <groupId>org.du-lab.javanmf</groupId>
     <artifactId>javanmf</artifactId>
-    <version>0.1.5</version>
+    <version>0.2.0-EJML</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
