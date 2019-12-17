@@ -19,13 +19,14 @@
 package org.dulab.javanmf.algorithms;
 
 import org.dulab.javanmf.measures.Measure;
-import org.jblas.DoubleMatrix;
-import org.jblas.Solve;
+import org.ejml.data.DMatrixRMaj;
 
 import org.dulab.javanmf.updaterules.UpdateRule;
 
 import javax.annotation.Nonnull;
 import java.util.logging.Logger;
+
+import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
  * This class performs non-negative matrix regression: for given matrices X and W, find matrix H that minimizes the
@@ -89,7 +90,7 @@ public class MatrixRegression
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, @Nonnull DoubleMatrix limit,
+    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h, @Nonnull DMatrixRMaj limit,
                               boolean verbose)
     {
 //        DoubleMatrix h = Solve.solveLeastSquares(w, x)
@@ -103,7 +104,9 @@ public class MatrixRegression
         for (k = 1; k < maxIteration + 1; ++k)
         {
             updateRule.update(x, w, h);
-            h.mini(limit);
+
+            MatrixUtils.minimumEquals(h, limit);
+//            h.mini(limit);
 
             if (k % 10 == 0) {
                 double error = Math.sqrt(2 * measure.get(x, w, h));
@@ -131,7 +134,7 @@ public class MatrixRegression
      * @param limit matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], the upper limit for matrix H
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h, @Nonnull DoubleMatrix limit) {
+    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h, @Nonnull DMatrixRMaj limit) {
         return solve(x, w, h, limit, false);
     }
 
@@ -144,9 +147,11 @@ public class MatrixRegression
      * @param verbose flag to output verbose information
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h,  boolean verbose)
+    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h,  boolean verbose)
     {
-        DoubleMatrix limit = DoubleMatrix.ones(w.columns, x.columns).mul(Double.MAX_VALUE);
+        DMatrixRMaj limit = new DMatrixRMaj(w.numCols, x.numCols);
+        fill(limit, Double.MAX_VALUE);
+//        DMatrixRMaj limit = DoubleMatrix.ones(w.numCols, x.numCols).mul(Double.MAX_VALUE);
         return solve(x, w, h, limit, verbose);
     }
 
@@ -158,7 +163,7 @@ public class MatrixRegression
      *          coefficients
      * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DoubleMatrix solve(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h) {
         return solve(x, w, h, false);
     }
 }

@@ -19,7 +19,7 @@
 package org.dulab.javanmf.updaterules;
 
 import org.dulab.javanmf.measures.Measure;
-import org.jblas.DoubleMatrix;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
 
@@ -51,5 +51,5 @@ public abstract class UpdateRule
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      * @return increment of |H|
      */
-    abstract public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h);
+    abstract public double update(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h);
 }

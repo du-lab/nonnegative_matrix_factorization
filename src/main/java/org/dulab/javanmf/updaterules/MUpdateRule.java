@@ -19,10 +19,11 @@
 package org.dulab.javanmf.updaterules;
 
 import org.dulab.javanmf.measures.EuclideanDistance;
-import org.jblas.DoubleMatrix;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
-import java.util.stream.IntStream;
+
+import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
  * Performs multiplicative update for the euclidean distance with regularization
@@ -30,11 +31,9 @@ import java.util.stream.IntStream;
  */
 public class MUpdateRule extends RegularizationUpdateRule
 {
-    private DoubleMatrix wtBuffer = null;
-    private DoubleMatrix hBuffer = null;
-    private DoubleMatrix wtxBuffer = null;
-    private DoubleMatrix wtwBuffer = null;
-    private DoubleMatrix wtwhBuffer = null;
+    private DMatrixRMaj wtx = null;
+    private DMatrixRMaj wtw = null;
+    private DMatrixRMaj wtwh = null;
 
     /**
      * Creates an instance of {@link MUpdateRule} with given regularization coefficients
@@ -46,45 +45,37 @@ public class MUpdateRule extends RegularizationUpdateRule
     }
 
     @Override
-    public double update(@Nonnull DoubleMatrix x, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h)
+    public double update(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h)
     {
-        double a = x.length;
-        double b = h.length;
+        double a = x.getNumElements();
+        double b = h.getNumElements();
 
 //        DoubleMatrix wt = w.transpose();
 //        h.muli(wt.mmul(x).div(wt.mmul(w).mmul(h).add(a / b * lambda).add(h.mul(a / b * mu)).max(1e-12)));
 
-        if (wtBuffer == null || wtBuffer.rows != w.columns || wtBuffer.columns != w.rows)
-            wtBuffer = new DoubleMatrix(w.columns, w.rows);
+        if (wtx == null || wtx.numRows != w.numCols || wtx.numCols != x.numCols)
+            wtx = new DMatrixRMaj(w.numCols, x.numCols);
 
-        if (hBuffer == null || hBuffer.rows != h.rows || hBuffer.columns != h.columns)
-            hBuffer = new DoubleMatrix(h.rows, h.columns);
+        if (wtw == null || wtw.numRows != w.numCols || wtw.numCols != w.numCols)
+            wtw = new DMatrixRMaj(w.numCols, w.numCols);
 
-        if (wtxBuffer == null || wtxBuffer.rows != w.columns || wtxBuffer.columns != x.columns)
-            wtxBuffer = new DoubleMatrix(w.columns, x.columns);
+        if (wtwh == null || wtwh.numRows != w.numCols || wtwh.numCols != h.numCols)
+            wtwh = new DMatrixRMaj(w.numCols, h.numCols);
 
-        if (wtwBuffer == null || wtwBuffer.rows != w.columns || wtwBuffer.columns != w.columns)
-            wtwBuffer = new DoubleMatrix(w.columns, w.columns);
+        // Nominator
+        multTransA(w, x, wtx);  // wtx = wt * x
 
-        if (wtwhBuffer == null || wtwhBuffer.rows != w.columns || wtwhBuffer.columns != h.columns)
-            wtwhBuffer = new DoubleMatrix(w.columns, h.columns);
+        // Denominator
+        multTransA(w, w, wtw);  // wtw = wt * w
+        mult(wtw, h, wtwh);  // wtwh = wt * w * h
+        add(wtwh, lambda * a / b);  // wtwh = wt * w * h + lambda * a / b
+        addEquals(wtwh, mu * a / b, h);  // wtwh = wt * w * h + lambda * a / b + mu * a / b * h
+        add(wtwh, 1e-12);  // wtwh = wt * w * h + lambda * a / b + mu * a / b * h + 1e-12
 
-
-        transpose(w, wtBuffer);
-        hBuffer.copy(h);
-        h.muli(wtBuffer.mmuli(x, wtxBuffer).divi(
-                wtBuffer.mmuli(w, wtwBuffer)
-                        .mmuli(h, wtwhBuffer)
-                        .addi(a / b * lambda)
-                        .addi(hBuffer.muli(a / b * mu))
-                        .maxi(1e-12)));
+        // Fraction
+        elementDiv(wtx, wtwh);  // wtx = wtx (/) wtwh
+        elementMult(h, wtx);  // h = h (*) wtx
 
         return 0.0;
-    }
-
-    private void transpose(DoubleMatrix w, DoubleMatrix wt) {
-        for (int i = 0; i < w.rows; ++i)
-            for (int j = 0; j < w.columns; ++j)
-                wt.put(j, i, w.get(i, j));
     }
 }

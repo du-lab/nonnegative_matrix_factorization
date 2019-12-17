@@ -1,7 +1,6 @@
 package org.dulab.javanmf.measures;
 
 import org.ejml.data.DMatrixRMaj;
-import org.jblas.DoubleMatrix;
 
 import javax.annotation.Nonnull;
 

@@ -19,9 +19,7 @@
 package org.dulab.javanmf.algorithms;
 
 import org.dulab.javanmf.measures.Measure;
-import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
-//import org.jblas.*;
 import org.dulab.javanmf.updaterules.UpdateRule;
 
 import javax.annotation.Nonnull;
@@ -132,7 +130,7 @@ public class MatrixFactorization {
             updateRuleW.update(xt, transpose(h, htBuffer), wt);
 
             if (k % 10 == 0) {
-                double error = measure.get(x, MatrixUtils.transpose(wt, wttBuffer), h);
+                double error = measure.get(x, transpose(wt, wttBuffer), h);
                 if (Math.abs(prevError - error) / initError < tolerance) {
                     if (verbose) LOG.fine("NMF is completed after " + k + " iterations");
                     break;
@@ -158,7 +156,7 @@ public class MatrixFactorization {
      * @param w    matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of initial components
      * @param h    matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of initial coefficients
      */
-    public void execute(@Nonnull DoubleMatrix data, @Nonnull DoubleMatrix w, @Nonnull DoubleMatrix h) {
+    public void execute(@Nonnull DMatrixRMaj data, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h) {
         execute(data, w, h, false);
     }
 }

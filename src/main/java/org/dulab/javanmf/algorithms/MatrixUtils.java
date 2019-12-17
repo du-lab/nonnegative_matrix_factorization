@@ -18,33 +18,41 @@
 
 package org.dulab.javanmf.algorithms;
 
-import org.jblas.DoubleMatrix;
+import org.ejml.data.DMatrixRMaj;
+
+import java.util.function.Function;
 
 /**
  * @author Du-Lab Team dulab.binf@gmail.com
  */
 public class MatrixUtils {
 
-    public static DoubleMatrix multiply(DoubleMatrix x, DoubleMatrix y, DoubleMatrix buffer) {
+//    public static DoubleMatrix multiply(DoubleMatrix x, DoubleMatrix y, DoubleMatrix buffer) {
+//
+//        if (x.rows != buffer.rows || y.columns != buffer.columns)
+//            buffer.resize(x.rows, y.columns);
+//
+//        // Multiply x by y and assign the result to buffer
+//        x.mmuli(y, buffer);
+//
+//        return buffer;
+//    }
+//
+//    public static DoubleMatrix transpose(DoubleMatrix x, DoubleMatrix buffer) {
+//
+//        if (x.rows != buffer.columns || x.columns != buffer.rows)
+//            buffer.resize(x.columns, x.rows);
+//
+//        for (int i = 0; i < x.rows; ++i)
+//            for (int j = 0; j < x.columns; ++j)
+//                buffer.put(j, i, x.get(i, j));
+//
+//        return buffer;
+//    }
 
-        if (x.rows != buffer.rows || y.columns != buffer.columns)
-            buffer.resize(x.rows, y.columns);
-
-        // Multiply x by y and assign the result to buffer
-        x.mmuli(y, buffer);
-
-        return buffer;
-    }
-
-    public static DoubleMatrix transpose(DoubleMatrix x, DoubleMatrix buffer) {
-
-        if (x.rows != buffer.columns || x.columns != buffer.rows)
-            buffer.resize(x.columns, x.rows);
-
-        for (int i = 0; i < x.rows; ++i)
-            for (int j = 0; j < x.columns; ++j)
-                buffer.put(j, i, x.get(i, j));
-
-        return buffer;
+    public static void minimumEquals(DMatrixRMaj a, DMatrixRMaj b) {
+        for (int i = 0; i < a.numRows; ++i)
+            for (int j = 0; j < a.numCols; ++j)
+                a.unsafe_set(i, j, Math.min(a.unsafe_get(i, j), b.get(i, j)));
     }
 }
