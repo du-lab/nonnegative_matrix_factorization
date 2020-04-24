@@ -111,7 +111,7 @@ public class MatrixRegression
             if (k % 10 == 0) {
                 double error = Math.sqrt(2 * measure.get(x, w, h));
                 if ((prevError - error) / initError < tolerance) {
-                    if (verbose) LOG.fine("NLS is completed after " + k + " iterations");
+                    if (verbose) LOG.info("NLS is completed after " + k + " iterations");
                     break;
                 }
                 prevError = error;
@@ -119,7 +119,7 @@ public class MatrixRegression
         }
 
         if (verbose && k >= maxIteration)
-            LOG.fine("NLS does not converge after " + k + " iterations");
+            LOG.info("NLS does not converge after " + k + " iterations");
 
         return h;
     }
