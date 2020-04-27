@@ -38,4 +38,25 @@ public class BroJongNonNegativeLeastSquaresTest {
 
         assertArrayEquals(expectedD.data, matrixD.data, EPS);
     }
+
+    @Test
+    public void solve2() {
+
+        DMatrixRMaj matrixZ = new DMatrixRMaj(new double[][]{
+                new double[]{0.0372, 0.2869},
+                new double[]{0.6861, 0.7071},
+                new double[]{70.6233, 0.6245},
+                new double[]{0.6344, 0.6170}
+        });
+
+        DMatrixRMaj matrixX = new DMatrixRMaj(new double[]{0.8587, 0.1781, 0.0747, 0.8405});
+
+        DMatrixRMaj expectedD = new DMatrixRMaj(new double[]{0, 0.6929});
+
+        DMatrixRMaj matrixD = new DMatrixRMaj(matrixZ.numCols, matrixX.numCols);
+
+        new BroJongNonNegativeLeastSquares().solve(matrixX, matrixZ, matrixD);
+
+        assertArrayEquals(expectedD.data, matrixD.data, EPS);
+    }
 }

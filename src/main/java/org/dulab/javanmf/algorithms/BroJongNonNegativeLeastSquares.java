@@ -37,7 +37,7 @@ public class BroJongNonNegativeLeastSquares {
         multInner(matrixZ, matrixZtZ);
 
         DMatrixRMaj matrixW = calculateMatrixW(matrixZtX, matrixZtZ, matrixD);
-
+        // Main loop
         int[] maximumIndices = findActiveMaximumIndices(matrixW, activeSets, null);
         while(!checkAllEmpty(activeSets) && findMaximum(matrixW, maximumIndices) > TOLERANCE) {
 
@@ -146,12 +146,17 @@ public class BroJongNonNegativeLeastSquares {
     private double calculateAlpha(DMatrixRMaj matrixD, int column, DMatrixRMaj vectorS, Set<Integer> passiveSet) {
         double minimum = Double.MAX_VALUE;
         for (int i : passiveSet) {
+
+            double s = vectorS.get(i);
+            if (s > 0.0)
+                continue;
+
             double x = matrixD.unsafe_get(i, column);
-            x /= x - vectorS.get(i);
+            x /= x - s;
             if (x < minimum)
                 minimum = x;
         }
-        return -minimum;
+        return minimum;
     }
 
     /**
@@ -233,7 +238,7 @@ public class BroJongNonNegativeLeastSquares {
     private void updateSets(DMatrixRMaj matrixD, int column, Set<Integer> passiveSet, Set<Integer> activeSet) {
         for (int i = 0; i < matrixD.numRows; ++i) {
             double d = matrixD.unsafe_get(i, column);
-            if (-TOLERANCE < d && d < TOLERANCE) {
+            if (d == 0.0) {
                 passiveSet.remove(i);
                 activeSet.add(i);
             }
