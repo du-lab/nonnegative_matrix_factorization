@@ -93,3 +93,13 @@ Code contributions are welcome. Please, contact us if you have any questions.
 ## Licence
 
 This project is licenced under the GNU GPL v2 licence - see the [LICENSE](LICENSE) file for details.
+
+## Versions
+
+#### Version 0.2.1
+
+- Adds the active set method for solving Non-Negative Least Squares problem
+
+#### Version 0.2.0
+ 
+- Replaces matrix library jBlas with EJML (Efficient Java Matrix Library)
