@@ -12,8 +12,14 @@ import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 public class BroJongNonNegativeLeastSquares {
 
-    private static final double TOLERANCE = 1e-4;
+    private static final double TOLERANCE = 1e-6;
 
+    /**
+     * Finds matrix D such that D = argmin || X - Z x D ||^2
+     * @param matrixX matrix X
+     * @param matrixZ matrix Z
+     * @param matrixD initial value of matrix D
+     */
     public void solve(DMatrixRMaj matrixX, DMatrixRMaj matrixZ, DMatrixRMaj matrixD) {
 
         if (matrixX.numCols != matrixD.numCols || matrixZ.numCols != matrixD.numRows || matrixX.numRows != matrixZ.numRows)
@@ -43,6 +49,8 @@ public class BroJongNonNegativeLeastSquares {
 
             for (int column = 0; column < matrixD.numCols; ++column) {
 
+//                System.out.println("Do main loop for column " + column);
+
                 Set<Integer> activeSet = activeSets.get(column);
                 Set<Integer> passiveSet = passiveSets.get(column);
                 int m = maximumIndices[column];
@@ -56,6 +64,7 @@ public class BroJongNonNegativeLeastSquares {
 
                 // Inner loop
                 while (findMinimum(vectorS, passiveSet) <= 0) {
+//                    System.out.println("Do inner loop for column " + column);
                     updateMatrixD(matrixD, column, vectorS, passiveSet);
                     updateSets(matrixD, column, passiveSet, activeSet);
                     vectorS = calculateVectorS(matrixZtZ, matrixZtX, column, passiveSet);
@@ -118,7 +127,10 @@ public class BroJongNonNegativeLeastSquares {
     private double findMaximum(DMatrixRMaj matrixW, int[] rows) {
         double maximum = -Double.MAX_VALUE;
         for (int i = 0; i < matrixW.numCols; ++i) {
-            double x = matrixW.unsafe_get(rows[i], i);
+            int row = rows[i];
+            if (row == -1)
+                continue;
+            double x = matrixW.get(row, i);
             if (x > maximum)
                 maximum = x;
         }
@@ -238,7 +250,7 @@ public class BroJongNonNegativeLeastSquares {
     private void updateSets(DMatrixRMaj matrixD, int column, Set<Integer> passiveSet, Set<Integer> activeSet) {
         for (int i = 0; i < matrixD.numRows; ++i) {
             double d = matrixD.unsafe_get(i, column);
-            if (d == 0.0) {
+            if (-TOLERANCE < d && d < TOLERANCE) {
                 passiveSet.remove(i);
                 activeSet.add(i);
             }
