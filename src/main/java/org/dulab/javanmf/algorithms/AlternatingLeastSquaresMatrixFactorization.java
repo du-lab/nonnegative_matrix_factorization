@@ -20,14 +20,13 @@ package org.dulab.javanmf.algorithms;
 
 import org.dulab.javanmf.measures.EuclideanDistance;
 import org.dulab.javanmf.measures.Measure;
-import org.dulab.javanmf.updaterules.UpdateRule;
 import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.logging.Logger;
 
-import static org.ejml.dense.row.CommonOps_DDRM.fill;
+import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
  * This class performs non-negative matrix regression: for given matrices X and W, find matrix H that minimizes the
@@ -50,9 +49,9 @@ import static org.ejml.dense.row.CommonOps_DDRM.fill;
  *
  * @author Du-Lab Team dulab.binf@gmail.com
  */
-public class ConstrainedNonNegativeLeastSquares {
+public class AlternatingLeastSquaresMatrixFactorization {
     /* Logger */
-    private static final Logger LOG = Logger.getLogger(ConstrainedNonNegativeLeastSquares.class.getName());
+    private static final Logger LOG = Logger.getLogger(AlternatingLeastSquaresMatrixFactorization.class.getName());
 
     /* Tolerance of the fitting error */
     private final double tolerance;
@@ -61,27 +60,33 @@ public class ConstrainedNonNegativeLeastSquares {
     private final int maxIteration;
 
     /* Update rule */
-    private final Constraint constraint;
+    private final Constraint wConstraint;
+    private final Constraint hConstraint;
 
     /* Distance measure associated with the update rule */
     private final Measure measure;
 
     /* Solver of the non-negative least squares problem */
-    private final BroJongNonNegativeLeastSquares nonNegativeLeastSquares;
+    private final BroJongNonNegativeLeastSquares nonNegativeLeastSquaresForW;
+    private final BroJongNonNegativeLeastSquares nonNegativeLeastSquaresForH;
 
     /**
-     * Creates an instance of {@link ConstrainedNonNegativeLeastSquares}
+     * Creates an instance of {@link AlternatingLeastSquaresMatrixFactorization}
      *
-     * @param constraint   instance of {@link Constraint} for matrix H
+     * @param wConstraint   instance of {@link Constraint} for matrix W
+     * @param hConstraint   instance of {@link Constraint} for matrix H
      * @param tolerance    the fitting error tolerance
      * @param maxIteration maximum number of iterations to use
      */
-    public ConstrainedNonNegativeLeastSquares(@Nullable Constraint constraint, double tolerance, int maxIteration) {
-        this.constraint = constraint != null ? constraint : new DefaultConstraint();
+    public AlternatingLeastSquaresMatrixFactorization(@Nullable Constraint wConstraint, @Nullable Constraint hConstraint,
+                                                      double tolerance, int maxIteration) {
+        this.wConstraint = wConstraint != null ? wConstraint : new DefaultConstraint();
+        this.hConstraint = hConstraint != null ? hConstraint : new DefaultConstraint();
         this.tolerance = tolerance;
         this.maxIteration = maxIteration;
         this.measure = new EuclideanDistance();
-        this.nonNegativeLeastSquares = new BroJongNonNegativeLeastSquares();
+        this.nonNegativeLeastSquaresForW = new BroJongNonNegativeLeastSquares();
+        this.nonNegativeLeastSquaresForH = new BroJongNonNegativeLeastSquares();
     }
 
     /**
@@ -93,33 +98,39 @@ public class ConstrainedNonNegativeLeastSquares {
      * @param h       matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
      *                coefficients
      * @param verbose flag to output verbose information
-     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h, boolean verbose) {
+    public void solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h, boolean verbose) {
 
         final double initError = Math.sqrt(2 * measure.get(x, w, h));
         double prevError = initError;
 
+        DMatrixRMaj xt = transpose(x, null);
+
+        DMatrixRMaj wtBuffer = transpose(w, null);
+        DMatrixRMaj htBuffer = new DMatrixRMaj(h.numCols, h.numRows);
+
         int k;
         for (k = 1; k < maxIteration + 1; ++k) {
 
-            nonNegativeLeastSquares.solve(x, w, h);
+            nonNegativeLeastSquaresForW.solve(xt, transpose(h, htBuffer), wtBuffer);
+            transpose(wtBuffer, w);
+            wConstraint.apply(w);
+            transpose(w, wtBuffer);
 
-            constraint.apply(h);
+            nonNegativeLeastSquaresForH.solve(x, w, h);
+            hConstraint.apply(h);
 
             double error = Math.sqrt(2 * measure.get(x, w, h));
             double v = (prevError - error) / initError;
             if (v < tolerance) {
-                if (verbose) LOG.info("NLS is completed after " + k + " iterations");
+                if (verbose) LOG.info("NMF is completed after " + k + " iterations");
                 break;
             }
             prevError = error;
         }
 
         if (verbose && k >= maxIteration)
-            LOG.info("NLS does not converge after " + k + " iterations");
-
-        return h;
+            LOG.info("NMF does not converge after " + k + " iterations");
     }
 
     /**
@@ -130,9 +141,8 @@ public class ConstrainedNonNegativeLeastSquares {
      * @param w matrix of shape [N<sub>points</sub>, N<sub>components</sub>], a collection of components
      * @param h matrix of shape [N<sub>components</sub>, N<sub>vectors</sub>], a collection of the decomposition
      *          coefficients
-     * @return matrix H of shape [N<sub>components</sub>, N<sub>vectors</sub>]
      */
-    public DMatrixRMaj solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h) {
-        return solve(x, w, h, false);
+    public void solve(@Nonnull DMatrixRMaj x, @Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h) {
+        solve(x, w, h, false);
     }
 }
