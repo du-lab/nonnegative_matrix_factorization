@@ -8,9 +8,7 @@ gradient-descent update rules are supported.
 
 ##### Implemented distance org.dulab.javanmf.measures
 
-- Euclidean distance || *X* &minus; *WH* ||<sup>2</sup>. 
-
-- Generalized Kullback-Leibler divergence &sum; ( *X* log ( *X* / *WH* ) &minus; *X* &plus; *WH* ).
+- Euclidean distance || *X* &minus; *WH* ||<sup>2</sup>.
 
 ##### Implemented update rules
 
@@ -24,8 +22,16 @@ Framework](http://ieeexplore.ieee.org/document/5936739/).
 
 ##### Implemented org.dulab.javanmf.algorithms
 
+- Alternating Least Squares (ALS) method for solving the non-negative matrix factorization (NMF). 
+Based on [H Kim and H, Park, Nonnegative matrix factorization based on alternating nonnegativity constrained
+least squares and active set method](https://epubs.siam.org/doi/pdf/10.1137/07069239X).
+
 - Non-negative matrix factorization (NMF), performed by alternating updates of matrices *W* and *H* to
 minimize the distance between *X* and *WH*.
+
+- Active set method for solving non-negative least squares problem. Based on [R. Bro and S.D. Jong, A fast 
+non‐negativity‐constrained least squares algorithm](
+https://doi.org/10.1002/(SICI)1099-128X(199709/10)11:5%3C393::AID-CEM483%3E3.0.CO;2-L).
 
 - Non-negative optimization, performed by updating matrix *H* to minimize the distance between 
 *X* and *WH*.
@@ -64,8 +70,8 @@ final int num_points = matrixX.rows;
 final int num_vectors = matrixX.columns;
 
 // Create matrices W and H
-DoubleMatrix matrixW = new DoubleMatrix(num_points, num_components);
-DoubleMatrix matrixH = new DoubleMatrix(num_components, num_vectors);
+DMatrixRMaj matrixW = new DMatrixRMaj(num_points, num_components);
+DMatrixRMaj matrixH = new DMatrixRMaj(num_components, num_vectors);
 
 // Initialize matrices W and H by the NNDSVD-method
 new SingularValueDecomposition(matrixX).decompose(matrixW, matrixH);
@@ -78,6 +84,20 @@ UpdateRule updateRuleH = new MUpdateRule(0.0, 1.0);
 
 // Perform factorization
 new MatrixFactorization(updateRuleW, updateRuleH, 1e-4, 10000).execute(matrixX, matrixW, matrixH);
+```
+
+Or, perform non-negative matrix factorization using the alternating least squares method.
+```java
+final int num_points = matrixX.rows;
+final int num_vectors = matrixX.columns;
+
+// Randomly initialize matrices W and H
+Random random = new Random(0);
+DMatrixRMaj matrixW = rectangle(num_points, num_components, 0.0, 1.0, random);
+DMatrixRMaj matrixH = rectangle(num_components, num_vectors, 0.0, 1.0, random);
+
+// Perform factorization
+new AlternatingLeastSquaresMatrixFactorization(1e-4, 10000).solve(matrixX, matrixW, matrixH);
 ```
 
 Detailed __API documentation__ can be found [here](https://du-lab.github.io/nonnegative_matrix_factorization/).
