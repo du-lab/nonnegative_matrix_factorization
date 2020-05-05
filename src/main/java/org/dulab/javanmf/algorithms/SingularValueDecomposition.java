@@ -22,6 +22,9 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 
+import static org.ejml.dense.row.CommonOps_DDRM.*;
+import static org.ejml.dense.row.NormOps_DDRM.normF;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -67,6 +70,15 @@ public class SingularValueDecomposition
         matrixU = svd.getU(null, false);
         vectorS = svd.getW(null);
         matrixV = svd.getV(null, false);
+
+        DMatrixRMaj matrixUS = new DMatrixRMaj(matrixU.numRows, vectorS.numCols);
+        mult(matrixU, vectorS, matrixUS);
+
+        DMatrixRMaj matrixE = x.copy();
+        multAddTransB(-1.0, matrixUS, matrixV, matrixE);
+        double error = normF(matrixE);
+
+        System.out.println(error);
     }
 
     /**
@@ -94,7 +106,7 @@ public class SingularValueDecomposition
 
     private void calculate(@Nonnull DMatrixRMaj w, @Nonnull DMatrixRMaj h, int index)
     {
-        if (index < 0 || index >= vectorS.getNumElements())
+        if (index < 0 || index >= vectorS.numRows || index >= vectorS.numCols)
             throw new IllegalArgumentException("Index " + index + " is out of range");
 
         double uPositiveNorm = columnPositiveNorm2(matrixU, index);
@@ -106,7 +118,7 @@ public class SingularValueDecomposition
         double mn = uNegativeNorm * vNegativeNorm;
 
         if (mp > mn) {
-            double sqrtS = Math.sqrt(vectorS.get(index) * mp);
+            double sqrtS = Math.sqrt(vectorS.get(index, index) * mp);
 
             for (int i = 0; i < w.numRows; ++i) {
                 double value = Math.max(matrixU.get(i, index), 0.0);
@@ -121,7 +133,7 @@ public class SingularValueDecomposition
             }
         }
         else {
-            double sqrtS = Math.sqrt(vectorS.get(index) * mn);
+            double sqrtS = Math.sqrt(vectorS.get(index, index) * mn);
 
             for (int i = 0; i < w.numRows; ++i) {
                 double value = -Math.min(matrixU.get(i, index), 0.0);

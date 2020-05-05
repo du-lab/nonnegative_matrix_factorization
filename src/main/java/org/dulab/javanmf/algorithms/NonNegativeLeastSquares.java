@@ -9,8 +9,12 @@ import java.util.Set;
 
 import static org.ejml.dense.row.CommonOps_DDRM.*;
 
-
-public class BroJongNonNegativeLeastSquares {
+/**
+ * This class solves the non-negative least squares problem using the active set method.
+ *
+ * See R. Bro and S.D. Jong "A FAST NON-NEGATIVITY-CONSTRAINED LEAST SQUARES ALGORITHM"
+ */
+public class NonNegativeLeastSquares {
 
     private static final double TOLERANCE = 1e-6;
 
@@ -49,8 +53,6 @@ public class BroJongNonNegativeLeastSquares {
 
             for (int column = 0; column < matrixD.numCols; ++column) {
 
-//                System.out.println("Do main loop for column " + column);
-
                 Set<Integer> activeSet = activeSets.get(column);
                 Set<Integer> passiveSet = passiveSets.get(column);
                 int m = maximumIndices[column];
@@ -64,7 +66,6 @@ public class BroJongNonNegativeLeastSquares {
 
                 // Inner loop
                 while (findMinimum(vectorS, passiveSet) <= 0) {
-//                    System.out.println("Do inner loop for column " + column);
                     updateMatrixD(matrixD, column, vectorS, passiveSet);
                     updateSets(matrixD, column, passiveSet, activeSet);
                     vectorS = calculateVectorS(matrixZtZ, matrixZtX, column, passiveSet);

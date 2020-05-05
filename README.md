@@ -99,6 +99,7 @@ This project is licenced under the GNU GPL v2 licence - see the [LICENSE](LICENS
 #### Version 0.2.1
 
 - Adds the active set method for solving Non-Negative Least Squares problem
+- Adds the alternating least squares method for solving Non-Negative Least Squares problem
 
 #### Version 0.2.0
  

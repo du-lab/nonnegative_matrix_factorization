@@ -29,23 +29,9 @@ import java.util.logging.Logger;
 import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
- * This class performs non-negative matrix regression: for given matrices X and W, find matrix H that minimizes the
- * objective function
- * <p>
- * &emsp; D(X, WH) + &lambda;||H||<sub>1</sub> + 0.5 &mu;||H||<sup>2</sup>
- * <p>
- * where D(X, WH) is either the euclidean distance or the Kullback-Leibler divergence, ||&middot;|| is the
- * Frobenius norm, and ||&middot;||<sub>1</sub> is the <i>l</i><sub>1</sub>-norm.
- * <p>
- * <strong>Example</strong> for given matrices {@code matrixX} and {@code matrixW}, matrix {@code matrixH} is modified
- * to minimize the euclidean distance.
- * <pre> {@code
- *     UpdateRule updateRule = new MUpdateRule(0.0, 0.0);
+ * This class performs non-negative matrix factorization using the alternating non-negative least squares method.
  *
- *     MatrixRegression regression = new MatrixRegression(updateRule, 1e-6, 10000);
- *
- *     matrixH = regression.solve(matrixX, matrixW);
- * } </pre>
+ * See H. Kim and H. Park "NON-NEGATIVE MATRIX FACTORIZATION BASED ON ALTERNATING NON-NEGATIVITY CONSTRAINED LEAST SQUARES AND ACTIVE SET METHOD"
  *
  * @author Du-Lab Team dulab.binf@gmail.com
  */
@@ -60,33 +46,43 @@ public class AlternatingLeastSquaresMatrixFactorization {
     private final int maxIteration;
 
     /* Update rule */
-    private final Constraint wConstraint;
+    private final Constraint wtConstraint;
     private final Constraint hConstraint;
 
     /* Distance measure associated with the update rule */
     private final Measure measure;
 
     /* Solver of the non-negative least squares problem */
-    private final BroJongNonNegativeLeastSquares nonNegativeLeastSquaresForW;
-    private final BroJongNonNegativeLeastSquares nonNegativeLeastSquaresForH;
+    private final NonNegativeLeastSquares nonNegativeLeastSquaresForW;
+    private final NonNegativeLeastSquares nonNegativeLeastSquaresForH;
 
     /**
      * Creates an instance of {@link AlternatingLeastSquaresMatrixFactorization}
      *
-     * @param wConstraint   instance of {@link Constraint} for matrix W
+     * @param wtConstraint   instance of {@link Constraint} for matrix W^T
      * @param hConstraint   instance of {@link Constraint} for matrix H
      * @param tolerance    the fitting error tolerance
      * @param maxIteration maximum number of iterations to use
      */
-    public AlternatingLeastSquaresMatrixFactorization(@Nullable Constraint wConstraint, @Nullable Constraint hConstraint,
+    public AlternatingLeastSquaresMatrixFactorization(@Nullable Constraint wtConstraint, @Nullable Constraint hConstraint,
                                                       double tolerance, int maxIteration) {
-        this.wConstraint = wConstraint != null ? wConstraint : new DefaultConstraint();
+        this.wtConstraint = wtConstraint != null ? wtConstraint : new DefaultConstraint();
         this.hConstraint = hConstraint != null ? hConstraint : new DefaultConstraint();
         this.tolerance = tolerance;
         this.maxIteration = maxIteration;
         this.measure = new EuclideanDistance();
-        this.nonNegativeLeastSquaresForW = new BroJongNonNegativeLeastSquares();
-        this.nonNegativeLeastSquaresForH = new BroJongNonNegativeLeastSquares();
+        this.nonNegativeLeastSquaresForW = new NonNegativeLeastSquares();
+        this.nonNegativeLeastSquaresForH = new NonNegativeLeastSquares();
+    }
+
+    /**
+     * Creates an instance of {@link AlternatingLeastSquaresMatrixFactorization}
+     *
+     * @param tolerance    the fitting error tolerance
+     * @param maxIteration maximum number of iterations to use
+     */
+    public AlternatingLeastSquaresMatrixFactorization(double tolerance, int maxIteration) {
+        this(null, null, tolerance, maxIteration);
     }
 
     /**
@@ -106,22 +102,20 @@ public class AlternatingLeastSquaresMatrixFactorization {
 
         DMatrixRMaj xt = transpose(x, null);
 
-        DMatrixRMaj wtBuffer = transpose(w, null);
-        DMatrixRMaj htBuffer = new DMatrixRMaj(h.numCols, h.numRows);
+        DMatrixRMaj wt = transpose(w, null);
+        DMatrixRMaj ht = new DMatrixRMaj(h.numCols, h.numRows);
 
         int k;
         for (k = 1; k < maxIteration + 1; ++k) {
 
-            nonNegativeLeastSquaresForW.solve(xt, transpose(h, htBuffer), wtBuffer);
-            transpose(wtBuffer, w);
-            wConstraint.apply(w);
-            transpose(w, wtBuffer);
+            nonNegativeLeastSquaresForW.solve(xt, transpose(h, ht), wt);
+            wtConstraint.apply(wt);
 
-            nonNegativeLeastSquaresForH.solve(x, w, h);
+            nonNegativeLeastSquaresForH.solve(x, transpose(wt, w), h);
             hConstraint.apply(h);
 
             double error = Math.sqrt(2 * measure.get(x, w, h));
-            double v = (prevError - error) / initError;
+            double v = (prevError - error) / prevError;
             if (v < tolerance) {
                 if (verbose) LOG.info("NMF is completed after " + k + " iterations");
                 break;

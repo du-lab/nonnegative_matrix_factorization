@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class BroJongNonNegativeLeastSquaresTest {
+public class NonNegativeLeastSquaresTest {
 
     private static final double EPS = 1e-3;
 
@@ -34,7 +34,7 @@ public class BroJongNonNegativeLeastSquaresTest {
 
         DMatrixRMaj matrixD = new DMatrixRMaj(matrixZ.numCols, matrixX.numCols);
 
-        new BroJongNonNegativeLeastSquares().solve(matrixX, matrixZ, matrixD);
+        new NonNegativeLeastSquares().solve(matrixX, matrixZ, matrixD);
 
         assertArrayEquals(expectedD.data, matrixD.data, EPS);
     }
@@ -55,7 +55,7 @@ public class BroJongNonNegativeLeastSquaresTest {
 
         DMatrixRMaj matrixD = new DMatrixRMaj(matrixZ.numCols, matrixX.numCols);
 
-        new BroJongNonNegativeLeastSquares().solve(matrixX, matrixZ, matrixD);
+        new NonNegativeLeastSquares().solve(matrixX, matrixZ, matrixD);
 
         assertArrayEquals(expectedD.data, matrixD.data, EPS);
     }
