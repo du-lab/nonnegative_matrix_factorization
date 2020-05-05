@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.dulab.javanmf.algorithms"},{"l":"org.dulab.javanmf.measures"},{"l":"org.dulab.javanmf.updaterules"}]
