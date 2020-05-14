@@ -194,6 +194,11 @@ public class NonNegativeLeastSquares {
      */
     private DMatrixRMaj calculateVectorS(DMatrixRMaj matrixZtZ, DMatrixRMaj matrixZtX, int columnIndex, Set<Integer> passiveSet) {
 
+        DMatrixRMaj vectorS = new DMatrixRMaj(matrixZtX.numRows, 1);
+
+        if (passiveSet.isEmpty())
+            return vectorS;
+
         DMatrixRMaj matrixZtZP = new DMatrixRMaj(passiveSet.size(), passiveSet.size());
         int ii = 0;
         for (int i : passiveSet) {
@@ -215,7 +220,6 @@ public class NonNegativeLeastSquares {
         DMatrixRMaj vectorSP = new DMatrixRMaj(passiveSet.size(), 1);
         mult(matrixZtZP, vectorZtXP, vectorSP);
 
-        DMatrixRMaj vectorS = new DMatrixRMaj(matrixZtX.numRows, 1);
         ii = 0;
         for (int i : passiveSet)
             vectorS.unsafe_set(i, 0, vectorSP.unsafe_get(ii++, 0));
