@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static org.ejml.dense.row.CommonOps_DDRM.*;
 
@@ -16,7 +17,10 @@ import static org.ejml.dense.row.CommonOps_DDRM.*;
  */
 public class NonNegativeLeastSquares {
 
+    private static final Logger LOG = Logger.getLogger(NonNegativeLeastSquares.class.getName());
+
     private static final double TOLERANCE = 1e-6;
+    private static final int MAX_ITERATIONS = 1000;
 
     /**
      * Finds matrix D such that D = argmin || X - Z x D ||^2
@@ -48,8 +52,14 @@ public class NonNegativeLeastSquares {
 
         DMatrixRMaj matrixW = calculateMatrixW(matrixZtX, matrixZtZ, matrixD);
         // Main loop
+        int iteration = 0;
         int[] maximumIndices = findActiveMaximumIndices(matrixW, activeSets, null);
         while(!checkAllEmpty(activeSets) && findMaximum(matrixW, maximumIndices) > TOLERANCE) {
+
+            if (++iteration > MAX_ITERATIONS) {
+                LOG.warning(String.format("NNLS is stopped after %d iterations.", MAX_ITERATIONS));
+                break;
+            }
 
             for (int column = 0; column < matrixD.numCols; ++column) {
 

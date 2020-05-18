@@ -116,6 +116,10 @@ This project is licenced under the GNU GPL v2 licence - see the [LICENSE](LICENS
 
 ## Versions
 
+#### Version 0.2.3
+
+- Set a limit on the number of iterations in NonNegativeLeastSquares algorithm
+
 #### Version 0.2.2
 
 - Fix the error when the passive set is empty and vector S is calculated
